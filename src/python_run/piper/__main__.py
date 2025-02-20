@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import sys
 import time
@@ -80,6 +81,11 @@ def main() -> None:
         action="store_true",
         help="Download latest voices.json during startup",
     )
+    parser.add_argument(
+        "--json-input",
+        action="store_true",
+        help="stdin input is lines of JSON instead of plain text",
+    )
     #
     parser.add_argument(
         "--debug", action="store_true", help="Print DEBUG messages to console"
@@ -140,11 +146,20 @@ def main() -> None:
             if not line:
                 continue
 
+            text = line
+            synthesize_args = synthesize_args.copy()
             wav_path = output_dir / f"{time.monotonic_ns()}.wav"
-            with wave.open(str(wav_path), "wb") as wav_file:
-                voice.synthesize(line, wav_file, **synthesize_args)
 
-            _LOGGER.info("Wrote %s", wav_path)
+            if args.json_input:
+                json_data = json.loads(line)
+                text = json_data["text"]
+                wav_path = json_data.get("output_file", wav_path)
+                synthesize_args["speaker_id"] = json_data.get("speaker_id", args.speaker)
+
+            wav_path = str(wav_path)
+            with wave.open(wav_path, "wb") as wav_file:
+                voice.synthesize(text, wav_file, **synthesize_args)
+            print(wav_path, flush=True)
     else:
         # Read entire input
         text = sys.stdin.read()

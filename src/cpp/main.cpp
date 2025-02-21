@@ -88,6 +88,9 @@ struct RunConfig {
 
   // true to use CUDA execution provider
   bool useCuda = false;
+
+  // true to use Rocm execution provider
+  bool useRocm = false;
 };
 
 void parseArgs(int argc, char *argv[], RunConfig &runConfig);
@@ -440,6 +443,8 @@ void printUsage(char *argv[]) {
        << endl;
   cerr << "   --use-cuda                    use CUDA execution provider"
        << endl;
+  cerr << "   --use-rocm                    use Rocm execution provider"
+       << endl;
   cerr << "   --debug                       print DEBUG messages to the console"
        << endl;
   cerr << "   -q       --quiet              disable logging" << endl;
@@ -525,6 +530,9 @@ void parseArgs(int argc, char *argv[], RunConfig &runConfig) {
       runConfig.jsonInput = true;
     } else if (arg == "--use_cuda" || arg == "--use-cuda") {
       runConfig.useCuda = true;
+    else if  (arg == "--use_rocm" || arg == "--use-rocm") {
+      runConfig.useRocm = true;
+    }
     } else if (arg == "--version") {
       std::cout << piper::getVersion() << std::endl;
       exit(0);

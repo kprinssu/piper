@@ -259,7 +259,7 @@ void terminate(PiperConfig &config) {
   spdlog::info("Terminated piper");
 }
 
-void loadModel(std::string modelPath, ModelSession &session, bool useCuda) {
+void loadModel(std::string modelPath, ModelSession &session, bool useCuda, bool useRocm) {
   spdlog::debug("Loading onnx model from {}", modelPath);
   session.env = Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING,
                          instanceName.c_str());
@@ -270,6 +270,11 @@ void loadModel(std::string modelPath, ModelSession &session, bool useCuda) {
     OrtCUDAProviderOptions cuda_options{};
     cuda_options.cudnn_conv_algo_search = OrtCudnnConvAlgoSearchHeuristic;
     session.options.AppendExecutionProvider_CUDA(cuda_options);
+  }
+
+  if (useRocm) {
+    OrtROCMProviderOptions rocm_options{ device_id: 0 };
+    session.options.AppendExecutionProvider_ROCM(rocm_options);
   }
 
   // Slows down performance by ~2x
@@ -308,7 +313,7 @@ void loadModel(std::string modelPath, ModelSession &session, bool useCuda) {
 // Load Onnx model and JSON config file
 void loadVoice(PiperConfig &config, std::string modelPath,
                std::string modelConfigPath, Voice &voice,
-               std::optional<SpeakerId> &speakerId, bool useCuda) {
+               std::optional<SpeakerId> &speakerId, bool useCuda, bool useRocm) {
   spdlog::debug("Parsing voice config at {}", modelConfigPath);
   std::ifstream modelConfigFile(modelConfigPath);
   voice.configRoot = json::parse(modelConfigFile);
@@ -329,7 +334,7 @@ void loadVoice(PiperConfig &config, std::string modelPath,
 
   spdlog::debug("Voice contains {} speaker(s)", voice.modelConfig.numSpeakers);
 
-  loadModel(modelPath, voice.session, useCuda);
+  loadModel(modelPath, voice.session, useCuda, useRocm);
 
 } /* loadVoice */
 

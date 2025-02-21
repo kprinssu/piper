@@ -156,12 +156,14 @@ target_link_directories(piper PUBLIC
   ${FMT_DIR}/lib
   ${SPDLOG_DIR}/lib
   ${PIPER_PHONEMIZE_DIR}/lib
+  ${ONNXRUNTIME_GPU_DIR}/lib
 )
 
 target_include_directories(piper PUBLIC
   ${FMT_DIR}/include
   ${SPDLOG_DIR}/include
   ${PIPER_PHONEMIZE_DIR}/include
+  ${ONNXRUNTIME_GPU_DIR}/include
 )
 
 target_compile_definitions(piper PUBLIC _PIPER_VERSION=${piper_version})

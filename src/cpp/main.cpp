@@ -532,7 +532,6 @@ void parseArgs(int argc, char *argv[], RunConfig &runConfig) {
       runConfig.useCuda = true;
     } else if (arg == "--use_rocm" || arg == "--use-rocm") {
       runConfig.useRocm = true;
-    }
     } else if (arg == "--version") {
       std::cout << piper::getVersion() << std::endl;
       exit(0);

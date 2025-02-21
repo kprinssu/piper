@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
   auto startTime = chrono::steady_clock::now();
   loadVoice(piperConfig, runConfig.modelPath.string(),
             runConfig.modelConfigPath.string(), voice, runConfig.speakerId,
-            runConfig.useCuda);
+            runConfig.useCuda, runConfig.useRocm);
   auto endTime = chrono::steady_clock::now();
   spdlog::info("Loaded voice in {} second(s)",
                chrono::duration<double>(endTime - startTime).count());
@@ -530,7 +530,7 @@ void parseArgs(int argc, char *argv[], RunConfig &runConfig) {
       runConfig.jsonInput = true;
     } else if (arg == "--use_cuda" || arg == "--use-cuda") {
       runConfig.useCuda = true;
-    else if  (arg == "--use_rocm" || arg == "--use-rocm") {
+    } else if (arg == "--use_rocm" || arg == "--use-rocm") {
       runConfig.useRocm = true;
     }
     } else if (arg == "--version") {

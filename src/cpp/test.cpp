@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   optional<piper::SpeakerId> speakerId;
   loadVoice(piperConfig, modelPath, modelPath + ".json", voice, speakerId,
-            false);
+            false, false);
   piper::initialize(piperConfig);
 
   // Output audio to WAV file

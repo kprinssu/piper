@@ -273,7 +273,8 @@ void loadModel(std::string modelPath, ModelSession &session, bool useCuda, bool 
   }
 
   if (useRocm) {
-    OrtROCMProviderOptions rocm_options{ device_id: 0 };
+    OrtROCMProviderOptions rocm_options{};
+    rocm_options.device_id = 0;
     session.options.AppendExecutionProvider_ROCM(rocm_options);
   }
 

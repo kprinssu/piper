@@ -70,6 +70,67 @@ if(NOT DEFINED PIPER_PHONEMIZE_DIR)
   add_dependencies(test_piper piper_phonemize_external)
 endif()
 
+# ---- onnxruntime-gpu ----
+
+# Look for onnxruntime files in <root>/lib
+if(NOT DEFINED ONNXRUNTIME_GPU_DIR)
+    if(NOT DEFINED ONNXRUNTIME_GPU_VERSION)
+        set(ONNXRUNTIME_VERSION "1.14.1")
+    endif()
+
+    if(WIN32)
+        # Windows x86-64
+        set(ONNXRUNTIME_GPU_PREFIX "onnxruntime-win-x64-gpu-${ONNXRUNTIME_VERSION}")
+        set(ONNXRUNTIME_GPU_EXT "zip")
+    elseif (APPLE)
+        if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
+            # MacOS x86-64
+            set(ONNXRUNTIME_GPU_PREFIX "onnxruntime-osx-x86_64-gpu-${ONNXRUNTIME_VERSION}")
+        elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL arm64)
+            # MacOS Apple Silicon
+            set(ONNXRUNTIME_GPU_PREFIX "onnxruntime-osx-arm64-gpu-${ONNXRUNTIME_VERSION}")
+        else()
+            message(FATAL_ERROR "Unsupported architecture for onnxruntime")
+        endif()
+
+        set(ONNXRUNTIME_GPU_EXT "tgz")
+    else()
+        if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
+            # Linux x86-64
+            set(ONNXRUNTIME_GPU_PREFIX "onnxruntime-linux-x64-gpu-${ONNXRUNTIME_VERSION}")
+        elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
+            # Linux ARM 64-bit
+            set(ONNXRUNTIME_GPU_PREFIX "onnxruntime-linux-aarch64-gpu-${ONNXRUNTIME_VERSION}")
+        elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL armv7l)
+            # Linux ARM 32-bit
+            set(ONNXRUNTIME_GPU_PREFIX "onnxruntime-linux-arm32-gpu-${ONNXRUNTIME_VERSION}")
+            set(ONNXRUNTIME_GPU_URL "https://github.com/synesthesiam/prebuilt-apps/releases/download/v1.0/onnxruntime-linux-arm32-${ONNXRUNTIME_VERSION}.tgz")
+        else()
+            message(FATAL_ERROR "Unsupported architecture for onnxruntime")
+        endif()
+
+        set(ONNXRUNTIME_GPU_EXT "tgz")
+    endif()
+
+    if(NOT DEFINED ONNXRUNTIME_GPU_URL)
+        set(ONNXRUNTIME_GPU_URL "https://github.com/microsoft/onnxruntime/releases/download/v${ONNXRUNTIME_VERSION}/${ONNXRUNTIME_GPU_PREFIX}.${ONNXRUNTIME_GPU_EXT}")
+    endif()
+
+    set(ONNXRUNTIME_GPU_FILENAME "${ONNXRUNTIME_GPU_PREFIX}.${ONNXRUNTIME_GPU_EXT}")
+    set(ONNXRUNTIME_GPU_DIR "${CMAKE_CURRENT_LIST_DIR}/lib/${ONNXRUNTIME_GPU_PREFIX}")
+
+    if(NOT EXISTS "${ONNXRUNTIME_GPU_DIR}")
+        if(NOT EXISTS "download/${ONNXRUNTIME_GPU_FILENAME}")
+            # Download onnxruntime release
+            message("Downloading ${ONNXRUNTIME_GPU_URL}")
+            file(DOWNLOAD "${ONNXRUNTIME_GPU_URL}" "download/${ONNXRUNTIME_GPU_FILENAME}")
+        endif()
+
+        # Extract .zip or .tgz to a directory like lib/onnxruntime-linux-x64-1.14.1/
+        file(ARCHIVE_EXTRACT INPUT "download/${ONNXRUNTIME_GPU_FILENAME}" DESTINATION "${CMAKE_CURRENT_LIST_DIR}/lib")
+    endif()
+endif()
+
 # ---- Declare executable ----
 
 if((NOT MSVC) AND (NOT APPLE))
@@ -87,6 +148,7 @@ target_link_libraries(piper
   espeak-ng
   piper_phonemize
   onnxruntime
+  onnxruntime-gpu
   ${PIPER_EXTRA_LIBRARIES}
 )
 

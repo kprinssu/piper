@@ -51,6 +51,7 @@ class PiperVoice:
         else:
             providers = ["CPUExecutionProvider"]
 
+        print("Using execution providers: ", providers)
         return PiperVoice(
             config=PiperConfig.from_dict(config_dict),
             session=onnxruntime.InferenceSession(

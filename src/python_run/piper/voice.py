@@ -45,9 +45,9 @@ class PiperVoice:
                 )
             ]
         elif use_rocm:
-            providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
+            providers = ["ROCMExecutionProvider"]
         elif use_migraphx:
-            providers = ["MIGraphXExecutionProvider", "CPUExecutionProvider"]
+            providers = ["MIGraphXExecutionProvider"]
         else:
             providers = ["CPUExecutionProvider"]
 
